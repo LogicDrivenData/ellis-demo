@@ -535,4 +535,4 @@
 })();
 </script>
 </div>
-<script>(function(){function send(){parent.postMessage({type:'ellis-demo-height',height:document.documentElement.scrollHeight},'*');}if('ResizeObserver' in window)new ResizeObserver(send).observe(document.body);window.addEventListener('load',send);send();})();</script></body></html>
+<script>(function(){var el=document.getElementById('ellis-day');function send(){parent.postMessage({type:'ellis-demo-height',height:Math.ceil(el.getBoundingClientRect().height)},'*');}if('ResizeObserver' in window)new ResizeObserver(send).observe(el);window.addEventListener('load',send);window.addEventListener('resize',send);send();})();</script></body></html>
