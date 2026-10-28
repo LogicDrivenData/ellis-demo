@@ -30,6 +30,13 @@
 #ellis-day .ed-screen { position: relative; width: 100%; overflow: hidden; border-radius: 12px; background: #121212;
   box-shadow: 0 24px 60px rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.15); }
 #ellis-day .ed-screen:fullscreen { border-radius: 0; background: #000; }
+/* phones without the Fullscreen API (iPhone): the screen fills the window, the controls sit under it */
+#ellis-day.ed-fake .ed-screen { position: fixed; left: 0; top: 0; right: 0; bottom: var(--ed-barh, 60px); width: auto; height: auto !important;
+  border-radius: 0; background: #000; z-index: 2147483000; }
+#ellis-day.ed-fake .ed-bar { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: #111; justify-content: center; z-index: 2147483001; }
+#ellis-day.ed-fake .ed-cap, #ellis-day.ed-fake .ed-theme { display: none; }
+html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
 #ellis-day .ed-frame { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; display: block; }
 #ellis-day .ed-bar { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
 #ellis-day .ed-cap { flex: 1; min-width: 260px; font-size: 16px; min-height: 48px; display: flex; align-items: center; }
@@ -188,9 +195,10 @@
   var money = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
 
   // ---------- the frame: the real app, scaled to fit ----------
+  function realFs() { return document.fullscreenElement || document.webkitFullscreenElement; }
   function fit() {
-    var fs = document.fullscreenElement === screenBox;
-    var w = fs ? window.innerWidth : screenBox.clientWidth, h = fs ? window.innerHeight : Infinity;
+    var fs = realFs() === screenBox || root.classList.contains('ed-fake');
+    var w = screenBox.clientWidth, h = fs ? screenBox.clientHeight : Infinity;
     var s = Math.min(w / AW, h / AH);
     ifr.style.transform = 'scale(' + s + ')';
     ifr.style.left = fs ? ((w - AW * s) / 2) + 'px' : '0'; ifr.style.top = fs ? ((h - AH * s) / 2) + 'px' : '0';
@@ -198,6 +206,7 @@
   }
   if ('ResizeObserver' in window) new ResizeObserver(fit).observe(screenBox); else window.addEventListener('resize', fit);
   document.addEventListener('fullscreenchange', fit);
+  document.addEventListener('webkitfullscreenchange', fit);
   var ready = new Promise(function (res) {
     ifr.addEventListener('load', function () {
       D = ifr.contentDocument;
@@ -550,9 +559,30 @@
     ready.then(function () { var t = THEMES[theme]; Object.keys(t).forEach(function (k) { D.documentElement.style.setProperty(k, t[k]); }); });
     this.textContent = theme === 'dark' ? 'Light look' : 'Dark look';
   });
-  var fsBtn = $('.ed-fs');
-  if (!screenBox.requestFullscreen) fsBtn.style.display = 'none';
-  fsBtn.addEventListener('click', function () { if (document.fullscreenElement) document.exitFullscreen(); else screenBox.requestFullscreen().catch(function () {}); });
+  // Full screen: the browser's own where it can; on an iPhone (no Fullscreen API for a page) the screen fills the window
+  // instead, and inside the website's frame that means opening the demo's own page in a new tab first.
+  var fsBtn = $('.ed-fs'), bar = $('.ed-bar'), PAGE = 'https://logicdrivendata.github.io/ellis-demo/';
+  var canFs = !!(screenBox.requestFullscreen || screenBox.webkitRequestFullscreen) && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  var framed = false;
+  try { framed = window.top !== window; } catch (e) { framed = true; }
+  function setFake(on) {
+    root.classList.toggle('ed-fake', on);
+    document.documentElement.classList.toggle('ed-fake-lock', on);
+    fsBtn.textContent = on ? '✕ Exit full screen' : '⤢ Full screen';
+    if (on) root.style.setProperty('--ed-barh', bar.offsetHeight + 'px');
+    fit();
+  }
+  window.addEventListener('resize', function () { if (root.classList.contains('ed-fake')) setFake(true); });
+  fsBtn.addEventListener('click', function () {
+    if (realFs()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else if (root.classList.contains('ed-fake')) setFake(false);
+    else if (canFs) {
+      var r = (screenBox.requestFullscreen || screenBox.webkitRequestFullscreen).call(screenBox);
+      if (r && r.catch) r.catch(function () {});
+    } else if (framed) window.open(PAGE + '#full', '_blank');
+    else setFake(true);
+  });
+  if (location.hash === '#full' && !canFs && !framed) setFake(true);
 
   reset(0);
   if ('IntersectionObserver' in window) {
