@@ -15,17 +15,25 @@
 #ellis-day .ed-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ed-gold-ink); margin-bottom: 8px; }
 #ellis-day .ed-head h2 { font-size: clamp(28px, 3.8vw, 40px); line-height: 1.15; letter-spacing: -.01em; margin-bottom: 10px; }
 #ellis-day .ed-lead { font-size: 17px; color: var(--ed-muted); max-width: 740px; margin: 0 auto; }
-#ellis-day .ed-scenes { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 20px 0 14px; }
-#ellis-day .ed-chip { border: 1px solid var(--ed-line); background: #fff; color: var(--ed-ink); border-radius: 12px; padding: 7px 12px; cursor: pointer;
-  font-size: 13.5px; font-weight: 600; display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.25; text-align: left; }
-#ellis-day .ed-chip time { font-size: 11px; font-weight: 700; color: var(--ed-gold-ink); }
-#ellis-day .ed-chip small { font-size: 10.5px; font-weight: 700; color: var(--ed-muted); }
-#ellis-day .ed-chip small.new { color: #fff; background: var(--ed-gold-ink); border-radius: 999px; padding: 0 6px; }
-#ellis-day .ed-chip[aria-current="step"] { background: var(--ed-ink); color: #fff; border-color: var(--ed-ink); }
-#ellis-day .ed-chip[aria-current="step"] time { color: var(--ed-gold); }
-#ellis-day .ed-chip[aria-current="step"] small { color: #cfc9bd; }
-#ellis-day .ed-chip.done time::after { content: " ✓"; }
-#ellis-day .ed-chip:focus-visible, #ellis-day .ed-ctl:focus-visible, #ellis-day .calc input:focus-visible, #ellis-day .calc select:focus-visible,
+/* the chapter bar under the screen: one segment per part of the day (played gold, playing dark); hover shows its name */
+#ellis-day .ed-chapters { display: flex; gap: 3px; margin: 12px 0 2px; }
+#ellis-day .ed-seg { flex: 1; position: relative; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; }
+#ellis-day .ed-seg i { position: absolute; left: 0; right: 0; top: 8px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ed-muted) 30%, transparent); transition: background .3s; }
+#ellis-day .ed-seg.done i { background: var(--ed-gold); }
+#ellis-day .ed-seg[aria-current="step"] i { background: var(--ed-ink); top: 7px; height: 8px; }
+@media (hover: hover) { #ellis-day .ed-seg:hover i { background: var(--ed-gold-ink); } }
+#ellis-day .ed-seg::after { content: attr(data-tip); position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+  background: #1c1c1c; color: #f2efe8; font-size: 12.5px; font-weight: 600; padding: 5px 9px; border-radius: 7px; opacity: 0;
+  pointer-events: none; transition: opacity .15s; z-index: 3; }
+#ellis-day .ed-seg:first-child::after { left: 0; transform: none; }
+#ellis-day .ed-seg:last-child::after { left: auto; right: 0; transform: none; }
+@media (hover: hover) { #ellis-day .ed-seg:hover::after { opacity: 1; } }
+#ellis-day .ed-seg:focus-visible::after { opacity: 1; }
+#ellis-day .ed-now { font-size: 13px; font-weight: 700; color: var(--ed-muted); }
+#ellis-day .ed-now b { color: var(--ed-gold-ink); margin-right: 6px; }
+#ellis-day .ed-now small { font-size: 11px; font-weight: 700; margin-left: 6px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--ed-line); }
+#ellis-day .ed-now small.new { color: #fff; background: var(--ed-gold-ink); border-color: var(--ed-gold-ink); }
+#ellis-day .ed-seg:focus-visible, #ellis-day .ed-ctl:focus-visible, #ellis-day .calc input:focus-visible, #ellis-day .calc select:focus-visible,
 #ellis-day .cta a:focus-visible, #ellis-day .ed-end a:focus-visible, #ellis-day .ed-end button:focus-visible { outline: 3px solid var(--ed-gold); outline-offset: 2px; }
 #ellis-day .ed-screen { position: relative; width: 100%; overflow: hidden; border-radius: 12px; background: #121212;
   box-shadow: 0 24px 60px rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.15); }
@@ -35,11 +43,12 @@
   border-radius: 0; background: #000; z-index: 2147483000; }
 #ellis-day.ed-fake .ed-bar { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   background: #111; justify-content: center; z-index: 2147483001; }
-#ellis-day.ed-fake .ed-cap, #ellis-day.ed-fake .ed-theme { display: none; }
+#ellis-day.ed-fake .ed-text, #ellis-day.ed-fake .ed-theme { display: none; }
 html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
 #ellis-day .ed-frame { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; display: block; }
 #ellis-day .ed-bar { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
-#ellis-day .ed-cap { flex: 1; min-width: 260px; font-size: 16px; min-height: 48px; display: flex; align-items: center; }
+#ellis-day .ed-text { flex: 1; min-width: 260px; }
+#ellis-day .ed-cap { font-size: 16px; min-height: 48px; display: flex; align-items: center; }
 #ellis-day .ed-cap b { color: var(--ed-gold-ink); margin-right: 8px; white-space: nowrap; }
 #ellis-day .ed-ctls { display: flex; gap: 8px; flex-wrap: wrap; }
 #ellis-day .ed-ctl { border: 1px solid var(--ed-line); background: #fff; color: var(--ed-ink); border-radius: 10px; padding: 9px 14px; cursor: pointer; font-weight: 700; font-size: 14px; }
@@ -48,8 +57,6 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
 #ellis-day .ed-ctl:disabled { opacity: .4; cursor: default; }
 #ellis-day .ed-ctl.nudge { border-color: var(--ed-gold); color: var(--ed-gold-ink); animation: ed-nudge 1.4s ease-in-out 4; }
 @keyframes ed-nudge { 50% { box-shadow: 0 0 0 4px rgba(201,152,42,.35); } }
-#ellis-day .ed-prog { height: 4px; background: var(--ed-line); border-radius: 2px; overflow: hidden; margin-top: 10px; }
-#ellis-day .ed-prog i { display: block; height: 100%; width: 0; background: var(--ed-gold); transition: width .3s; }
 #ellis-day .ed-note { text-align: center; font-size: 13px; color: var(--ed-muted); margin-top: 14px; }
 #ellis-day .ed-small-note { display: none; text-align: center; font-size: 13px; color: var(--ed-muted); margin-top: 8px; }
 /* the end card: if it's taller than the screen (a phone), fit() grows the screen; in full screen it scrolls instead.
@@ -84,9 +91,10 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
 #ellis-day .cta a.primary { background: var(--ed-gold); color: #1c1c1c; }
 @media (max-width: 760px) {
   #ellis-day .ed-wrap { padding: 36px 16px; }
-  #ellis-day .ed-scenes { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 4px; }
-  #ellis-day .ed-chip { flex: none; padding: 6px 9px; font-size: 12.5px; }
-  #ellis-day .ed-chip small { display: none; }
+  #ellis-day .ed-seg { height: 28px; }
+  #ellis-day .ed-seg i { top: 11px; }
+  #ellis-day .ed-seg[aria-current="step"] i { top: 10px; }
+  #ellis-day .ed-seg::after { display: none; }
   #ellis-day .ed-cap { font-size: 15px; }
   #ellis-day .ed-small-note { display: block; }
   #ellis-day .ed-end { padding: 18px 14px; }
@@ -116,7 +124,6 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
       new clients found, a meeting that writes itself up, hours turned into an invoice, and the year's sales at a glance. Press Play, or jump to any time of day.</p>
   </div>
 
-  <div class="ed-scenes" role="group" aria-label="Parts of the day"></div>
 
   <div class="ed-screen">
     <iframe class="ed-frame" title="Ellis with sample data" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
@@ -134,10 +141,11 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
       </div>
     </div>
   </div>
+  <div class="ed-chapters" role="group" aria-label="Parts of the day"></div>
   <p class="ed-small-note">Best on a computer. Tap Full screen and turn your phone sideways for a closer look.</p>
 
   <div class="ed-bar">
-    <div class="ed-cap" aria-live="polite"></div>
+    <div class="ed-text"><div class="ed-now"></div><div class="ed-cap" aria-live="polite"></div></div>
     <div class="ed-ctls">
       <button type="button" class="ed-ctl ed-back" aria-label="Previous part of the day">‹ Back</button>
       <button type="button" class="ed-ctl play ed-play">▶ Play</button>
@@ -147,7 +155,6 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
       <button type="button" class="ed-ctl small ed-fs">⤢ Full screen</button>
     </div>
   </div>
-  <div class="ed-prog" aria-hidden="true"><i></i></div>
   <p class="ed-note">The real Ellis with sample data; some steps are sped up. The chat needs the AI version. Prospecting uses a
     Hunter.io account (free to start), and invoices go through your own Stripe or QuickBooks Online account. Plans are shown on each part of the day.</p>
 
@@ -209,7 +216,7 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
   var NARR = {"intro": {"n": "", "text": "Hey there, I'm Ellis, your business's chief of staff. I keep your tasks, clients, quotes and invoices in one place, right on your own computer, and I never change a thing without your OK. You pay for me once, not every month. Come spend a day with me at Brightline Studio.", "file": "intro-c0d1e5f2.mp3"}, "m1": {"n": "8:00", "text": "Every morning starts with the brief: today's meetings, what's overdue, and who's waiting on you. No digging through five different tools.", "file": "m1-f99e67f5.mp3"}, "m2": {"n": "8:01", "text": "These are the follow-ups that usually slip: a quote nobody answered, a lead that went quiet. Each one is a click away from a drafted email.", "file": "m2-c6bf2214.mp3"}, "m3": {"n": "8:02", "text": "Just ask, typed or spoken. Ellis answers from your own board, calendar and quotes, not from a guess.", "file": "m3-9259ab95.mp3"}, "m4": {"n": "8:03", "text": "And nothing changes until you say so. Ellis asks first, every single time.", "file": "m4-a2be194c.mp3"}, "m5": {"n": "8:03", "text": "Approved, on the board, and logged with who made the change.", "file": "m5-3a28fbf2.mp3"}, "p1": {"n": "9:15", "text": "Alex wants more dental clients. With Prospecting, you describe the businesses you want in plain English.", "file": "p1-68639aab.mp3"}, "p2": {"n": "9:16", "text": "Real local companies come back in seconds, and anyone already in your CRM is flagged.", "file": "p2-1f60f364.mp3"}, "p3": {"n": "9:16", "text": "Here are the decision makers, with verified work emails. Ellis never guesses an address.", "file": "p3-78458e37.mp3"}, "p4": {"n": "9:17", "text": "One approval adds her to a follow-up sequence. It sends from Alex's own mailbox and stops the moment she replies.", "file": "p4-b5968a17.mp3"}, "p5": {"n": "+2 days", "text": "Two days later: three replies, each one already logged on the contact's record. New business came in while Alex did client work.", "file": "p5-da3c6689.mp3"}, "t1": {"n": "10:45", "text": "Alex recorded the Acme call right in Ellis, with the client's OK. When the call ends, Ellis writes it up.", "file": "t1-7e61f641.mp3"}, "t2": {"n": "10:46", "text": "A summary, the decisions, and every action item with an owner and a due date.", "file": "t2-09167728.mp3"}, "t3": {"n": "10:47", "text": "One click and all four are on the board. Nobody leaves a meeting wondering who's doing what.", "file": "t3-e0bcb2ad.mp3"}, "pj1": {"n": "11:30", "text": "Every project gets its own page: who owns it, when it's due, how far along it is, and its tasks in sections you drag them between.", "file": "pj1-2175e963.mp3"}, "pj2": {"n": "11:31", "text": "Tick a task off and the progress moves. On Pro, the whole team sees it live, comments right on the task, and your clients can follow along in their own portal.", "file": "pj2-13353396.mp3"}, "c1": {"n": "1:30", "text": "Every client gets one page: contacts, deals, quotes, documents, open tasks and the whole history.", "file": "c1-f6eae275.mp3"}, "c2": {"n": "1:31", "text": "Ask about any client and get the full picture in seconds, so you walk into every call prepared.", "file": "c2-ee5aaea7.mp3"}, "b1": {"n": "3:00", "text": "Here's where Ellis pays for itself. The time you track on tasks already knows what's billable.", "file": "b1-9a23b0a9.mp3"}, "b2": {"n": "3:01", "text": "One sentence turns those hours into a quote at your rates, and the time is marked billed, so nothing gets billed twice or forgotten.", "file": "b2-0221defb.mp3"}, "b3": {"n": "3:02", "text": "It goes out as a PDF with your logo, and Ellis reminds you if there's no answer.", "file": "b3-5fb43de9.mp3"}, "b4": {"n": "Next day", "text": "When the client says yes, one more sentence creates the invoice in your Stripe or QuickBooks account. Paid or overdue shows up in tomorrow's brief, and your customers, invoices and payments stay in step with QuickBooks and Stripe every night.", "file": "b4-f9272226.mp3"}, "r1": {"n": "4:30", "text": "Back from a site visit with a receipt? Drop in the photo, or snap it with Ellis on your phone.", "file": "r1-cea9e78f.mp3"}, "r2": {"n": "4:31", "text": "Vendor, date, amount and category are read for you, then it waits for a quick check. No more shoebox at tax time.", "file": "r2-1e88ae4c.mp3"}, "r3": {"n": "4:32", "text": "A bigger purchase, like a new laptop? Mark it an asset, and Ellis writes it off month by month and keeps the list your accountant asks for.", "file": "r3-b13806fb.mp3"}, "s1": {"n": "5:00", "text": "How's the year going? The Scorecard shows your pipeline, what's likely to close, your win rate and why deals were lost. The charts you'd get in HubSpot, without the per-seat bill.", "file": "s1-f5be50a3.mp3"}, "s2": {"n": "5:01", "text": "Click any bar to see the deals behind it. Profit, lead sources and your top clients are all here, and the whole thing downloads as a PDF.", "file": "s2-10cb75c5.mp3"}, "k1": {"n": "7:45", "text": "First, make it yours. Pick your colors and fonts, add your logo, and give the assistant any name you like.", "file": "k1-5778f487.mp3"}, "k2": {"n": "7:46", "text": "Your quotes and documents carry the same logo and colors. And on Pro, everyone on the team can pick their own look.", "file": "k2-b6375194.mp3"}, "d1": {"n": "5:45", "text": "End of the day. Every change Ellis made waited for Alex's OK.", "file": "d1-a1fe08d8.mp3"}, "fin": {"n": "", "text": "That's one day with Ellis. Your whole business in one app, on your own computer, and your data stays there. No per-user fees and no software subscription: you buy it once, a year of updates is included, and it keeps working after that. If you'd like updates to keep coming and a real person to call on, add an optional support plan, from forty-nine dollars a month. Scroll down to see what it could save you.", "file": "fin-de039971.mp3"}}, AUDIO = "audio/";
   var $ = function (s) { return root.querySelector(s); };
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var screenBox = $('.ed-screen'), ifr = $('.ed-frame'), cap = $('.ed-cap'), playBtn = $('.ed-play'), endBox = $('.ed-end'), prog = $('.ed-prog i');
+  var screenBox = $('.ed-screen'), ifr = $('.ed-frame'), cap = $('.ed-cap'), playBtn = $('.ed-play'), endBox = $('.ed-end');
   var AW = 1440, AH = 900, D = null, chatStart = '', theme = 'dark';
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var money = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
@@ -251,7 +258,7 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
   function byText(sel, text) { return qa(sel).filter(function (e) { return e.textContent.indexOf(text) !== -1; })[0]; }
 
   // ---------- the timeline engine ----------
-  var S = { scene: 0, run: 0, playing: false, ended: false, everPlayed: false, auto: false, seen: {} };
+  var S = { scene: 0, run: 0, playing: false, ended: false, everPlayed: false, auto: false };
   var STOP = {};
   function alive(id) { if (id !== S.run) throw STOP; }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -630,32 +637,38 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
   }
 
   // ---------- controls ----------
-  var chips = $('.ed-scenes');
-  chips.innerHTML = SCENES.map(function (s, i) {
-    return '<button type="button" class="ed-chip" data-i="' + i + '"><time>' + s.time + '</time>' + s.name
-      + (s.isNew ? ' <small class="new">New · ' + (s.plan || 'Pro') + '</small>' : s.plan ? ' <small>' + s.plan + '</small>' : '') + '</button>';
+  // the chapter bar: a segment per part of the day; the line above the caption names the one playing
+  var chapters = $('.ed-chapters'), nowLine = $('.ed-now');
+  chapters.innerHTML = SCENES.map(function (s, i) {
+    var label = s.time + ' · ' + s.name + (s.plan ? ' · ' + s.plan : '');
+    return '<button type="button" class="ed-seg" data-i="' + i + '" data-tip="' + esc(label) + '" aria-label="' + esc(label) + '"><i></i></button>';
   }).join('');
+  function showChapter(i, ended) {
+    Array.prototype.forEach.call(chapters.children, function (c, k) {
+      c.setAttribute('aria-current', !ended && k === i ? 'step' : 'false'); c.classList.toggle('done', ended || k < i);
+    });
+    var s = SCENES[i];
+    nowLine.innerHTML = '<b>' + (i + 1) + ' of ' + SCENES.length + '</b>' + esc(s.name)
+      + (s.isNew ? '<small class="new">New · ' + esc(s.plan || 'Pro') + '</small>' : s.plan ? '<small>' + esc(s.plan) + '</small>' : '');
+  }
   function reset(i) {
     S.run++; S.scene = i; S.ended = false;
     voice.pause(); sound.busy = false;
     endBox.classList.remove('show'); fit();
-    Array.prototype.forEach.call(root.querySelectorAll('.ed-chip'), function (c, k) { c.setAttribute('aria-current', k === i ? 'step' : 'false'); c.classList.toggle('done', !!S.seen[k] && k !== i); });
-    var cur = root.querySelectorAll('.ed-chip')[i];
-    if (chips.scrollWidth > chips.clientWidth) chips.scrollTo({ left: cur.offsetLeft - 16, behavior: reduce ? 'auto' : 'smooth' });
+    showChapter(i);
     $('.ed-back').disabled = i === 0;
-    prog.style.width = (i / SCENES.length * 100) + '%';
     var id = S.run;
     ready.then(function () {
       if (id !== S.run) return;
       resetFrame();
       return SCENES[i].run(id).then(async function () {
         while (sound.busy) { await sleep(100); alive(id); }
-        S.seen[i] = true; if (i + 1 < SCENES.length) reset(i + 1); else finish();
+        if (i + 1 < SCENES.length) reset(i + 1); else finish();
       });
     }).catch(function (e) { if (e !== STOP) throw e; });
   }
   function finish() {
-    S.ended = true; S.playing = false; prog.style.width = '100%';
+    S.ended = true; S.playing = false; showChapter(SCENES.length - 1, true);
     playBtn.textContent = '↻ Replay';
     endBox.classList.add('show'); fit();
     setCap(NARR.fin.n, NARR.fin.text);
@@ -682,7 +695,7 @@ html.ed-fake-lock, html.ed-fake-lock body { overflow: hidden; }
   $('.ed-back').addEventListener('click', function () { S.auto = false; reset(Math.max(0, S.scene - 1)); });
   $('.ed-replay').addEventListener('click', function () { reset(0); play(); });
   $('.ed-to-calc').addEventListener('click', function (e) { e.preventDefault(); $('#ellis-day-calc').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); });
-  chips.addEventListener('click', function (e) { var b = e.target.closest('.ed-chip'); if (b) { S.auto = false; reset(+b.dataset.i); play(); } });
+  chapters.addEventListener('click', function (e) { var b = e.target.closest('.ed-seg'); if (b) { S.auto = false; reset(+b.dataset.i); play(); } });
   $('.ed-theme').addEventListener('click', function () {
     theme = theme === 'dark' ? 'light' : 'dark';
     ready.then(function () { var t = THEMES[theme]; Object.keys(t).forEach(function (k) { D.documentElement.style.setProperty(k, t[k]); }); });
